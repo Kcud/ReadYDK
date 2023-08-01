@@ -1,6 +1,7 @@
 package db;
 
 import domain.YGOCard;
+import tool.CardType;
 
 import javax.smartcardio.Card;
 import java.sql.*;
@@ -23,12 +24,14 @@ public class ConnectYGOSQLite {
         }
     }
     public YGOCard getCardByPassword(String password){
-        String sql = "select id,name from texts where id ="+password;
+        String sql =  "SELECT texts.name, texts.id ,datas.type \n" +
+                "FROM \"texts\" INNER JOIN datas ON texts.id = datas.id \n" +
+                "WHERE texts.id = '"+password+"'";
         YGOCard card = null;
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
-            card = new YGOCard(resultSet.getString("id"),resultSet.getString("name"));
+            card = new YGOCard(resultSet.getString("id"),resultSet.getString("name"), CardType.getCardType(resultSet.getInt("type")));
         } catch (SQLException e) {
             e.printStackTrace();
         }
